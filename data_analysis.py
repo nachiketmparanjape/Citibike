@@ -2,6 +2,7 @@ import pandas as pd
 import sqlite3 as lite
 import collections
 import datetime
+import matplotlib.pyplot as plt
 
 con = lite.connect('citi_bike.db')
 cur = con.cursor()
@@ -40,3 +41,37 @@ print("\nWith %d bicycles coming and going in the hour between %s and %s" % (
     datetime.datetime.fromtimestamp(int(df.index[0])).strftime('%Y-%m-%dT%H:%M:%S'),
     datetime.datetime.fromtimestamp(int(df.index[-1])).strftime('%Y-%m-%dT%H:%M:%S'),
 ))
+
+
+# Data Visualization
+
+
+# Bar Chart of Activity and Station ID
+plt.figure(figsize=(16,8))
+plt.bar(list(hour_change.keys()), list(hour_change.values()))
+plt.xlabel("Station ID")
+plt.ylabel("Activity (Total Number of Bicycles Taken Out or Returned")
+plt.title("Activity in 1 hour v Station ID")
+plt.savefig("bike_activity.png")
+
+# Scatter Plot of Activity and Station Locations
+coord = pd.read_sql_query("SELECT longitude, latitude FROM citibike_reference", con)
+lon = coord["longitude"].tolist()
+lat = coord["latitude"].tolist()
+size = [s ** 1.5 for s in hour_change.values()]
+
+plt.figure(figsize=(10, 10))
+plt.scatter(lon, lat, s=size, alpha=0.5)
+plt.scatter(data[3], data[2], s=hour_change[max_station] ** 1.5, alpha=1, c="r")
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.title("One hour CitiBike activity")
+plt.savefig("activity_scatter.png")
+
+plt.figure(figsize=(10, 10))
+plt.scatter(lon, lat, c=list(hour_change.values()), s=size, cmap=plt.cm.Oranges)
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.title("Coloured Scatter plot for one hour of activity")
+plt.colorbar(plt.scatter(lon, lat, c=list(hour_change.values()), s=size, cmap=plt.cm.Oranges))
+plt.savefig("activity_scatter_colored.png")

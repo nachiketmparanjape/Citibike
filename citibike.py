@@ -42,6 +42,6 @@ for i in range(60):
             print("Warning - " + str(e))
     con.commit()
 
-    time.sleep(1)
+    time.sleep(60)
 
 con.close() #close the database connection when done
